@@ -7,11 +7,15 @@ import ai.timefold.solver.core.api.domain.solution.ProblemFactCollectionProperty
 import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
 import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
 import ai.timefold.solver.core.api.solver.SolverStatus;
+import jakarta.persistence.Id;
 
 import java.util.List;
 
 @PlanningSolution
 public class Timetable {
+
+    @Id
+    private Long id = 1L;
 
     private String name;
 
@@ -79,4 +83,7 @@ public class Timetable {
         this.solverStatus = solverStatus;
     }
 
+    public Long getId() {
+        return id;
+    }
 }

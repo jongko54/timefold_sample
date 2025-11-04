@@ -1,9 +1,12 @@
 package org.acme.schooltimetabling.rest;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import ai.timefold.solver.core.api.score.analysis.ScoreAnalysis;
 import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
@@ -12,6 +15,7 @@ import ai.timefold.solver.core.api.solver.SolutionManager;
 import ai.timefold.solver.core.api.solver.SolverManager;
 import ai.timefold.solver.core.api.solver.SolverStatus;
 
+import org.acme.schooltimetabling.domain.Lesson;
 import org.acme.schooltimetabling.domain.Timetable;
 import org.acme.schooltimetabling.rest.exception.ErrorInfo;
 import org.acme.schooltimetabling.rest.exception.TimetableSolverException;
@@ -58,7 +62,7 @@ public class TimetableController {
     private final ConcurrentMap<String, Job> jobIdToJob = new ConcurrentHashMap<>();
 
     public TimetableController(SolverManager<Timetable, String> solverManager,
-            SolutionManager<Timetable, HardSoftScore> solutionManager) {
+                               SolutionManager<Timetable, HardSoftScore> solutionManager) {
         this.solverManager = solverManager;
         this.solutionManager = solutionManager;
     }
@@ -67,7 +71,7 @@ public class TimetableController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all job IDs.",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(type = "array", implementation = String.class))) })
+                            schema = @Schema(type = "array", implementation = String.class)))})
     @GetMapping
     public Collection<String> list() {
         return jobIdToJob.keySet();
@@ -78,7 +82,7 @@ public class TimetableController {
             @ApiResponse(responseCode = "202",
                     description = "The job ID. Use that ID to get the solution with the other methods.",
                     content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
-                            schema = @Schema(implementation = String.class))) })
+                            schema = @Schema(implementation = String.class)))})
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
     public String solve(@RequestBody Timetable problem) {
         String jobId = UUID.randomUUID().toString();
@@ -100,7 +104,7 @@ public class TimetableController {
             @ApiResponse(responseCode = "202",
                     description = "Resulting score analysis, optionally without constraint matches.",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ScoreAnalysis.class))) })
+                            schema = @Schema(implementation = ScoreAnalysis.class)))})
     @PutMapping(value = "/analyze", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RegisterReflectionForBinding({
             RoomConflictJustification.class,
@@ -111,7 +115,7 @@ public class TimetableController {
             TeacherTimeEfficiencyJustification.class
     })
     public ScoreAnalysis<HardSoftScore> analyze(@RequestBody Timetable problem,
-            @RequestParam(name = "fetchPolicy", required = false) ScoreAnalysisFetchPolicy fetchPolicy) {
+                                                @RequestParam(name = "fetchPolicy", required = false) ScoreAnalysisFetchPolicy fetchPolicy) {
         return fetchPolicy == null ? solutionManager.analyze(problem) : solutionManager.analyze(problem, fetchPolicy);
     }
 
@@ -190,6 +194,31 @@ public class TimetableController {
         solverManager.terminateEarly(jobId);
         return getTimeTable(jobId);
     }
+
+    /**
+     * 특정 교수의 시간표만 조회하는 API
+     *
+     * @param teacherName URL 경로에서 받아온 교수 이름
+     * @return 해당 교수의 모든 Lesson 목록
+     */
+    @GetMapping("/{jobId}/byTeacher/{teacherName}")
+    public List<Lesson> getLessonsByTeacher(@PathVariable String teacherName, @PathVariable("jobId") String jobId) {
+        // 현재 최적화가 완료된 최상의 시간표를 가져옵니다.
+        // (만약 해결 중이 아니라면, 초기 상태의 시간표를 가져옵니다.)
+        //Timetable timetable = timetableRepository.findById(SINGLETON_TIMETABLE_ID);
+        Timetable timetable = getTimetableAndCheckForExceptions(jobId);
+
+        if (timetable.getLessons() == null) {
+            return Collections.emptyList();
+        }
+        // 전체 Lesson 목록에서 Java Stream을 사용하여 필터링합니다.
+        return timetable.getLessons().stream()
+                // 필터 조건: Lesson의 교수 이름이 URL로 받은 teacherName과 (대소문자 무시하고) 같은 경우
+                .filter(lesson -> lesson.getTeacher().equalsIgnoreCase(teacherName))
+                // 필터링된 결과만 모아서 새로운 List로 만듭니다.
+                .collect(Collectors.toList());
+    }
+
 
     private record Job(Timetable timetable, Throwable exception) {
 

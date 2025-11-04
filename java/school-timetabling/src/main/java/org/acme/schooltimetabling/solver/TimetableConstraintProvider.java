@@ -19,6 +19,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 roomConflict(constraintFactory),
                 teacherConflict(constraintFactory),
                 studentGroupConflict(constraintFactory),
+                algorithmsInRoomC(constraintFactory),
                 // Soft constraints
                 teacherRoomStability(constraintFactory),
                 teacherTimeEfficiency(constraintFactory),
@@ -100,6 +101,17 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 })
                 .penalize(HardSoftScore.ONE_SOFT)
                 .asConstraint("Student group subject variety");
+    }
+
+    Constraint algorithmsInRoomC(ConstraintFactory constraintFactory) {
+
+        return constraintFactory
+                .forEach(Lesson.class)
+                .filter(lesson -> lesson.getSubject().equals("Algorithms"))
+                .filter(lesson -> lesson.getRoom() != null
+                        && !lesson.getRoom().getName().equals("Room C"))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("algorithms subject Room C");
     }
 
 }

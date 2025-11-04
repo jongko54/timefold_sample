@@ -3,16 +3,23 @@ package org.acme.schooltimetabling.domain;
 import ai.timefold.solver.core.api.domain.lookup.PlanningId;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @JsonIdentityInfo(scope = Timeslot.class, generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@Entity
 public class Timeslot {
 
     @PlanningId
-    private String id;
+    @Id
+    private Long id;
 
+    @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -20,14 +27,14 @@ public class Timeslot {
     public Timeslot() {
     }
 
-    public Timeslot(String id, DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
+    public Timeslot(Long id, DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
         this.id = id;
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public Timeslot(String id, DayOfWeek dayOfWeek, LocalTime startTime) {
+    public Timeslot(Long id, DayOfWeek dayOfWeek, LocalTime startTime) {
         this(id, dayOfWeek, startTime, startTime.plusMinutes(50));
     }
 
@@ -40,7 +47,7 @@ public class Timeslot {
     // Getters and setters
     // ************************************************************************
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

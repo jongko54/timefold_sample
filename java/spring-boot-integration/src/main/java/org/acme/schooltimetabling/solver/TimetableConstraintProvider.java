@@ -8,7 +8,9 @@ import ai.timefold.solver.core.api.score.stream.Joiners;
 import org.acme.schooltimetabling.domain.Lesson;
 import org.acme.schooltimetabling.solver.justifications.*;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalTime;
 
 public class TimetableConstraintProvider implements ConstraintProvider {
 
@@ -19,10 +21,12 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 roomConflict(constraintFactory),
                 teacherConflict(constraintFactory),
                 studentGroupConflict(constraintFactory),
+                algorithmsInRoomC(constraintFactory),
                 // Soft constraints
                 teacherRoomStability(constraintFactory),
                 teacherTimeEfficiency(constraintFactory),
-                studentGroupSubjectVariety(constraintFactory)
+                studentGroupSubjectVariety(constraintFactory),
+                avoidMondayMorningFirstHour(constraintFactory)
         };
     }
 
@@ -107,6 +111,29 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .penalize(HardSoftScore.ONE_SOFT)
                 .justifyWith((lesson1, lesson2, score) -> new StudentGroupSubjectVarietyJustification(lesson1.getStudentGroup(), lesson1, lesson2))
                 .asConstraint("Student group subject variety");
+    }
+
+    Constraint algorithmsInRoomC(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Lesson.class)
+                .filter(lesson -> lesson.getSubject().equals("Algorithms"))
+                .filter(lesson -> lesson.getRoom() != null
+                        && !lesson.getRoom().getName().equals("Room C"))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("algorithms subject Room C");
+    }
+
+    Constraint avoidMondayMorningFirstHour(ConstraintFactory constraintFactory) {
+        // 모든 수업(Lesson)을 하나씩 확인한다.
+        return constraintFactory
+                .forEach(Lesson.class)
+                // 필터 조건: 수업 시간이 월요일(MONDAY)이고, 시작 시간이 8시 30분이면
+                .filter(lesson -> lesson.getTimeslot() != null &&
+                        lesson.getTimeslot().getDayOfWeek() == DayOfWeek.MONDAY &&
+                        lesson.getTimeslot().getStartTime().equals(LocalTime.of(8, 30)))
+                // 이 규칙은 선호 규칙이므로 Soft 점수 10점을 깎는다.
+                .penalize(HardSoftScore.ofSoft(10))
+                .asConstraint("Avoid Monday morning first hour");
     }
 
 }

@@ -30,6 +30,7 @@ dependencies {
     implementation "io.quarkus:quarkus-smallrye-openapi"
     implementation "ai.timefold.solver:timefold-solver-quarkus"
     implementation "ai.timefold.solver:timefold-solver-quarkus-jackson"
+    implementation "ai.timefold.solver:timefold-solver-quarkus-benchmark"
 
     // Testing
     testImplementation "io.quarkus:quarkus-junit5"

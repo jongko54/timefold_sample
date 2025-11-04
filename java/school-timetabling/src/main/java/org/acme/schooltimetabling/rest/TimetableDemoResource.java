@@ -106,6 +106,7 @@ public class TimetableDemoResource {
         lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "I. Jones", "9th grade"));
         lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "9th grade"));
         lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "9th grade"));
+        lessons.add(new Lesson(Long.toString(nextLessonId++), "Algorithms", "Dr. Babbage", "9th grade"));
         if (demoData == DemoData.LARGE) {
             lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "9th grade"));
             lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "9th grade"));
@@ -134,6 +135,7 @@ public class TimetableDemoResource {
         lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "10th grade"));
         lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "10th grade"));
         lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "10th grade"));
+        lessons.add(new Lesson(Long.toString(nextLessonId++), "Algorithms", "Dr. Babbage", "10th grade"));
         if (demoData == DemoData.LARGE) {
             lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "10th grade"));
             lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "10th grade"));

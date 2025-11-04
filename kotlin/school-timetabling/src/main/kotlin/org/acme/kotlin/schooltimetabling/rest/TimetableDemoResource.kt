@@ -112,6 +112,7 @@ class TimetableDemoResource {
         lessons.add(Lesson(nextLessonId++.toString(), "English", "I. Jones", "9th grade"))
         lessons.add(Lesson(nextLessonId++.toString(), "Spanish", "P. Cruz", "9th grade"))
         lessons.add(Lesson(nextLessonId++.toString(), "Spanish", "P. Cruz", "9th grade"))
+        lessons.add(Lesson(nextLessonId++.toString(), "Algorithms", "Dr. Babbage", "9th grade"))
         if (demoData == DemoData.LARGE) {
             lessons.add(Lesson(nextLessonId++.toString(), "Math", "A. Turing", "9th grade"))
             lessons.add(Lesson(nextLessonId++.toString(), "Math", "A. Turing", "9th grade"))
@@ -139,6 +140,7 @@ class TimetableDemoResource {
         lessons.add(Lesson(nextLessonId++.toString(), "History", "I. Jones", "10th grade"))
         lessons.add(Lesson(nextLessonId++.toString(), "English", "P. Cruz", "10th grade"))
         lessons.add(Lesson(nextLessonId++.toString(), "Spanish", "P. Cruz", "10th grade"))
+        lessons.add(Lesson(nextLessonId++.toString(), "Algorithms", "Dr. Babbage", "10th grade"))
         if (demoData == DemoData.LARGE) {
             lessons.add(Lesson(nextLessonId++.toString(), "Math", "A. Turing", "10th grade"))
             lessons.add(Lesson(nextLessonId++.toString(), "Math", "A. Turing", "10th grade"))
